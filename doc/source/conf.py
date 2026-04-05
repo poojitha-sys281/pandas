@@ -964,12 +964,15 @@ def linkcode_resolve(domain, info) -> str | None:
             return None
 
     try:
-        fn = inspect.getsourcefile(inspect.unwrap(obj))
+        unwrapped = inspect.unwrap(obj)
+        fn = inspect.getsourcefile(unwrapped) or inspect.getfile(unwrapped)
     except TypeError:
         try:  # property
-            fn = inspect.getsourcefile(inspect.unwrap(obj.fget))
+            obj = inspect.unwrap(obj.fget)
+            fn = inspect.getsourcefile(obj) or inspect.getfile(obj)
         except (AttributeError, TypeError):
             fn = None
+    
     if not fn:
         return None
 
