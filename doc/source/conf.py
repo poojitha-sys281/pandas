@@ -962,28 +962,41 @@ def linkcode_resolve(domain, info) -> str | None:
                 obj = getattr(obj, part)
         except AttributeError:
             return None
-
     try:
-        fn = inspect.getsourcefile(inspect.unwrap(obj))
+        unwrapped = inspect.unwrap(obj)
+        fn = inspect.getsourcefile(unwrapped)
+        if fn is None:
+            try:
+                fn = inspect.getfile(unwrapped)
+            except TypeError:
+                fn = None
     except TypeError:
         try:  # property
-            fn = inspect.getsourcefile(inspect.unwrap(obj.fget))
+            unwrapped = inspect.unwrap(obj.fget)
+            fn = inspect.getsourcefile(unwrapped)
+            if fn is None:
+                try:
+                    fn = inspect.getfile(unwrapped)
+                except TypeError:
+                    fn = None
         except (AttributeError, TypeError):
             fn = None
-    if not fn:
+
+    if fn is None:
         return None
 
     try:
-        source, lineno = inspect.getsourcelines(obj)
+        source, lineno = inspect.getsourcelines(unwrapped)
     except TypeError:
-        try:  # property
-            source, lineno = inspect.getsourcelines(obj.fget)
+        try:
+            source, lineno = inspect.getsourcelines(unwrapped.fget)
         except (AttributeError, TypeError):
+            source = None
             lineno = None
     except OSError:
+        source=None
         lineno = None
-
-    if lineno:
+    if lineno and source:
         linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
     else:
         linespec = ""
