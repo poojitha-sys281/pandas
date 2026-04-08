@@ -349,6 +349,11 @@ def unique(values):
         * ndarray : when the input is a Series/ndarray
 
         Return numpy.ndarray, ExtensionArray or NumpyExtensionArray.
+    Notes
+    -----
+    Boolean values (True/False) and integers (1/0) may be treated as equivalent
+    when operating on object-dtype data, since ``True == 1`` and ``False == 0``
+    in Python. As a result, these values may not be distinguished in outputs.
 
     See Also
     --------
@@ -691,6 +696,11 @@ def factorize(
 
            Even if there's a missing value in `values`, `uniques` will
            *not* contain an entry for it.
+    Notes
+    -----
+    Boolean values (True/False) and integers (1/0) may be treated as equivalent
+    when operating on object-dtype data, since ``True == 1`` and ``False == 0``
+    in Python. As a result, these values may not be distinguished in outputs.
 
     See Also
     --------
